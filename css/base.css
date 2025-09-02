@@ -1,0 +1,217 @@
+/* base.css - Reset y estilos base */
+
+/* Reset mejorado */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--fuente-principal);
+    font-size: var(--tamaño-texto-m);
+    font-weight: var(--peso-normal);
+    line-height: var(--altura-linea-normal);
+    color: var(--color-texto);
+    background-color: var(--color-fondo);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--peso-semibold);
+    line-height: var(--altura-linea-apretada);
+    color: var(--color-texto);
+}
+
+h1 { font-size: var(--tamaño-texto-xxxl); }
+h2 { font-size: var(--tamaño-texto-xxl); }
+h3 { font-size: var(--tamaño-texto-xl); }
+h4 { font-size: var(--tamaño-texto-l); }
+h5 { font-size: var(--tamaño-texto-m); }
+h6 { font-size: var(--tamaño-texto-s); }
+
+/* Enlaces */
+a {
+    color: var(--color-primario);
+    text-decoration: none;
+    transition: color var(--transicion-rapida);
+}
+
+a:hover {
+    color: var(--color-primario-hover);
+}
+
+a:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+    border-radius: var(--radio-s);
+}
+
+/* Imágenes */
+img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Formularios */
+input, textarea, select, button {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
+/* Listas */
+ul, ol {
+    list-style: none;
+}
+
+/* Tablas */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Código */
+code, pre {
+    font-family: var(--fuente-mono);
+    font-size: var(--tamaño-texto-s);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-fondo-secundario);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-borde-activo);
+    border-radius: var(--radio-completo);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-texto-deshabilitado);
+}
+
+/* Selección de texto */
+::selection {
+    background-color: var(--color-primario-claro);
+    color: var(--color-texto);
+}
+
+/* Deshabilitado */
+[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Oculto */
+[hidden], .oculto {
+    display: none !important;
+}
+
+/* Visualmente oculto pero accesible */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Contenedor de enfoque */
+.focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Utilidades */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.break-words {
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "VideoTR - Transcriptor de Vídeos",
+  "short_name": "VideoTR",
+  "description": "Transcriptor de vídeos potente y privado que funciona completamente en tu navegador",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "es",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Nueva transcripción",
+      "short_name": "Transcribir",
+      "description": "Iniciar una nueva transcripción",
+      "url": "/",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Pantalla principal de VideoTR"
+    }
+  ]
+}

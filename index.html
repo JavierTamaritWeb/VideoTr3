@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VideoTR - Transcriptor de vídeos en el navegador">
+    <meta name="theme-color" content="#2563eb">
+    
+    <title>VideoTR - Transcriptor de Vídeos [ACTUALIZADO]</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="apple-touch-icon" href="assets/logo.svg">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/componentes.css">
+    
+    <!-- ES Modules -->
+    <script type="module" src="js/main.js"></script>
+</head>
+<body class="aplicacion">
+    <!-- Cabecera -->
+    <header class="barra-cabecera">
+        <div class="barra-cabecera__contenedor">
+            <div class="barra-cabecera__marca">
+                <img src="assets/logo.svg" alt="VideoTR" class="barra-cabecera__logo">
+                <h1 class="barra-cabecera__titulo">VideoTR v3.0</h1>
+            </div>
+            <nav class="barra-cabecera__navegacion">
+                <button class="boton boton--icono" id="btn-registro" aria-label="Ver registro">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Registro
+                </button>
+                <button class="boton boton--icono" id="btn-configuracion" aria-label="Configuración">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 8.78l4.24 4.24M20.46 15.22l-4.24-4.24M8.78 22.46l-4.24-4.24"/>
+                    </svg>
+                    Ajustes
+                </button>
+                <button class="boton boton--icono" id="btn-pruebas" aria-label="Panel de pruebas">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                    Pruebas
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Área principal -->
+    <main class="area-trabajo">
+        <!-- Panel de entrada -->
+        <section class="panel-entrada" aria-label="Entrada de vídeo">
+            <div class="panel-entrada__cabecera">
+                <h2 class="panel-entrada__titulo">Entrada</h2>
+            </div>
+            
+            <!-- Zona de arrastrar y soltar -->
+            <div class="panel-entrada__zona-soltar" id="zona-soltar">
+                <svg class="panel-entrada__icono-upload" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p class="panel-entrada__instruccion">
+                    Arrastra un vídeo aquí o 
+                    <label for="selector-archivo" class="panel-entrada__selector-label">
+                        selecciona uno
+                    </label>
+                </p>
+                <div class="panel-entrada__formatos">
+                    <p class="panel-entrada__formatos-titulo">Formatos soportados:</p>
+                    <div class="panel-entrada__formatos-lista">
+                        <span class="formato-tag">MP4</span>
+                        <span class="formato-tag">WebM</span>
+                        <span class="formato-tag">AVI</span>
+                        <span class="formato-tag">MOV</span>
+                        <span class="formato-tag">MKV</span>
+                        <span class="formato-tag">WMV</span>
+                        <span class="formato-tag">FLV</span>
+                        <span class="formato-tag">OGV</span>
+                    </div>
+                </div>
+                <input type="file" id="selector-archivo" accept="video/*" class="panel-entrada__selector-archivo">
+            </div>
+
+            <!-- Tarjeta de vídeo cargado -->
+            <div class="tarjeta-video tarjeta-video--oculta" id="tarjeta-video">
+                <div class="tarjeta-video__miniatura-contenedor">
+                    <video class="tarjeta-video__miniatura" id="video-miniatura"></video>
+                    <div class="tarjeta-video__duracion" id="video-duracion">00:00</div>
+                </div>
+                <div class="tarjeta-video__info">
+                    <h3 class="tarjeta-video__nombre" id="video-nombre">video.mp4</h3>
+                    <div class="tarjeta-video__meta">
+                        <span class="tarjeta-video__tamaño" id="video-tamaño">0 MB</span>
+                        <span class="tarjeta-video__formato" id="video-formato">MP4</span>
+                    </div>
+                </div>
+                <button class="boton boton--icono tarjeta-video__eliminar" id="btn-eliminar-video" aria-label="Eliminar vídeo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Configuración de transcripción -->
+            <div class="panel-entrada__configuracion" id="config-transcripcion">
+                <h3 class="panel-entrada__subtitulo">Configuración de transcripción</h3>
+                
+                <div class="grupo-formulario">
+                    <label for="selector-motor" class="grupo-formulario__etiqueta">Motor de transcripción</label>
+                    <select id="selector-motor" class="selector">
+                        <option value="local">Local (Whisper WASM/WebGPU)</option>
+                        <option value="openai">OpenAI Whisper API</option>
+                        <option value="deepgram">Deepgram API</option>
+                        <option value="assemblyai">AssemblyAI API</option>
+                    </select>
+                </div>
+
+                <div class="grupo-formulario" id="grupo-modelo-local">
+                    <label for="selector-modelo" class="grupo-formulario__etiqueta">Modelo local</label>
+                    <select id="selector-modelo" class="selector">
+                        <option value="tiny">Tiny (39 MB - Rápido)</option>
+                        <option value="base" selected>Base (74 MB - Equilibrado)</option>
+                        <option value="small">Small (244 MB - Preciso)</option>
+                    </select>
+                </div>
+
+                <div class="grupo-formulario grupo-formulario--oculto" id="grupo-api-key">
+                    <label for="input-api-key" class="grupo-formulario__etiqueta">Clave API</label>
+                    <input type="password" id="input-api-key" class="input" placeholder="Introduce tu clave API">
+                    <p class="grupo-formulario__ayuda">Tu clave se usa solo en esta sesión</p>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="selector-idioma" class="grupo-formulario__etiqueta">Idioma del audio</label>
+                    <select id="selector-idioma" class="selector">
+                        <option value="auto">Detectar automáticamente</option>
+                        <option value="es">Español</option>
+                        <option value="en">Inglés</option>
+                        <option value="fr">Francés</option>
+                        <option value="de">Alemán</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Portugués</option>
+                    </select>
+                </div>
+
+                <button class="boton boton--primario boton--bloque" id="btn-transcribir" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Extraer audio y transcribir
+                </button>
+            </div>
+
+            <!-- Barra de progreso -->
+            <div class="barra-progreso barra-progreso--oculta" id="barra-progreso">
+                <div class="barra-progreso__pista">
+                    <div class="barra-progreso__relleno" id="progreso-relleno"></div>
+                </div>
+                <div class="barra-progreso__info">
+                    <span class="barra-progreso__texto" id="progreso-texto">Preparando...</span>
+                    <span class="barra-progreso__porcentaje" id="progreso-porcentaje">0%</span>
+                </div>
+            </div>
+
+            <!-- Log de proceso -->
+            <div class="log-proceso log-proceso--oculto" id="log-proceso">
+                <h3 class="log-proceso__titulo">Registro de proceso</h3>
+                <div class="log-proceso__contenido" id="log-contenido"></div>
+            </div>
+        </section>
+
+        <!-- Panel de salida -->
+        <section class="panel-salida" aria-label="Editor y exportación">
+            <div class="panel-salida__cabecera">
+                <h2 class="panel-salida__titulo">Editor de transcripción</h2>
+                <div class="panel-salida__acciones">
+                    <button class="boton boton--secundario" id="btn-copiar" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                        Copiar
+                    </button>
+                    <button class="boton boton--secundario" id="btn-limpiar" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editor de texto -->
+            <div class="editor-texto">
+                <textarea 
+                    class="editor-texto__area" 
+                    id="editor-transcripcion" 
+                    placeholder="La transcripción aparecerá aquí..."
+                    spellcheck="true"
+                    disabled
+                ></textarea>
+                <div class="editor-texto__barra-estado">
+                    <span class="editor-texto__contador" id="contador-caracteres">0 caracteres</span>
+                    <span class="editor-texto__contador" id="contador-palabras">0 palabras</span>
+                </div>
+            </div>
+
+            <!-- Opciones de exportación -->
+            <div class="panel-exportacion" id="panel-exportacion">
+                <h3 class="panel-exportacion__titulo">Exportar transcripción</h3>
+                <div class="panel-exportacion__botones">
+                    <button class="boton boton--exportar" id="btn-exportar-txt" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        TXT
+                    </button>
+                    <button class="boton boton--exportar" id="btn-exportar-md" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <path d="M8 13h2l2 3 2-6 2 3h2"/>
+                        </svg>
+                        MD
+                    </button>
+                    <button class="boton boton--exportar" id="btn-exportar-rtf" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="12" y1="13" x2="12" y2="17"/>
+                            <polyline points="9 13 12 13 12 17 9 17"/>
+                        </svg>
+                        RTF
+                    </button>
+                    <button class="boton boton--exportar" id="btn-exportar-docx" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <path d="M8 13h1l1 3 1-3 1 3 1-3h1"/>
+                        </svg>
+                        DOCX
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de registro -->
+    <div class="modal" id="modal-registro" role="dialog" aria-labelledby="titulo-registro" aria-hidden="true">
+        <div class="modal__contenido modal__contenido--grande">
+            <div class="modal__cabecera">
+                <h2 class="modal__titulo" id="titulo-registro">Registro de archivos</h2>
+                <button class="boton boton--icono modal__cerrar" aria-label="Cerrar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal__cuerpo">
+                <div class="registro__acciones">
+                    <button class="boton boton--secundario" id="btn-exportar-csv">
+                        Exportar CSV
+                    </button>
+                    <button class="boton boton--secundario" id="btn-exportar-json">
+                        Exportar JSON
+                    </button>
+                    <button class="boton boton--peligro" id="btn-limpiar-registro">
+                        Limpiar registro
+                    </button>
+                </div>
+                <div class="tabla-contenedor">
+                    <table class="tabla-registro">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Archivo</th>
+                                <th>Motor</th>
+                                <th>Tamaño</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-registro-cuerpo">
+                            <tr>
+                                <td colspan="6" class="tabla-registro__vacio">No hay registros</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de configuración -->
+    <div class="modal" id="modal-configuracion" role="dialog" aria-labelledby="titulo-configuracion" aria-hidden="true">
+        <div class="modal__contenido">
+            <div class="modal__cabecera">
+                <h2 class="modal__titulo" id="titulo-configuracion">Configuración</h2>
+                <button class="boton boton--icono modal__cerrar" aria-label="Cerrar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal__cuerpo">
+                <div class="configuracion">
+                    <div class="grupo-formulario">
+                        <label for="config-idioma-ui" class="grupo-formulario__etiqueta">Idioma de interfaz</label>
+                        <select id="config-idioma-ui" class="selector">
+                            <option value="es" selected>Español</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grupo-formulario">
+                        <label for="config-tema" class="grupo-formulario__etiqueta">Tema</label>
+                        <select id="config-tema" class="selector">
+                            <option value="auto">Automático</option>
+                            <option value="claro">Claro</option>
+                            <option value="oscuro">Oscuro</option>
+                        </select>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <label class="checkbox">
+                            <input type="checkbox" id="config-webgpu" checked>
+                            <span class="checkbox__etiqueta">Usar WebGPU si está disponible</span>
+                        </label>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <label class="checkbox">
+                            <input type="checkbox" id="config-cache-modelos" checked>
+                            <span class="checkbox__etiqueta">Cachear modelos de IA</span>
+                        </label>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <button class="boton boton--secundario" id="btn-limpiar-cache">
+                            Limpiar caché de modelos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de pruebas -->
+    <div class="panel-pruebas panel-pruebas--oculto" id="panel-pruebas">
+        <div class="panel-pruebas__cabecera">
+            <h2 class="panel-pruebas__titulo">Panel de pruebas</h2>
+            <button class="boton boton--icono" id="btn-cerrar-pruebas" aria-label="Cerrar panel">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="panel-pruebas__contenido">
+            <div class="prueba">
+                <h3 class="prueba__titulo">Smoke Test</h3>
+                <p class="prueba__descripcion">Prueba completa del flujo: carga → extracción → transcripción → exportación</p>
+                <button class="boton boton--primario" id="btn-ejecutar-smoke">Ejecutar prueba</button>
+                <div class="prueba__resultados" id="resultados-smoke"></div>
+            </div>
+
+            <div class="prueba">
+                <h3 class="prueba__titulo">Validación WAV</h3>
+                <button class="boton boton--secundario" id="btn-validar-wav">Validar último WAV</button>
+                <div class="prueba__resultados" id="resultados-wav"></div>
+            </div>
+
+            <div class="prueba">
+                <h3 class="prueba__titulo">Métricas</h3>
+                <div class="prueba__metricas" id="metricas"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div class="notificaciones" id="contenedor-notificaciones" aria-live="polite"></div>
+
+    <!-- Video de prueba embebido (base64) -->
+    <video id="video-prueba" style="display: none;" preload="auto">
+        <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAABnBtZGF0AAAC6QYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE0MiByMjQ3OSBkZDc5YTYxIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNCAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTMgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTI1IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAD2WIhAA3//728P4FNjuZQQAAAu5tb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAAZAABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACGHRyYWsAAABcdGtoZAAAAAMAAAAAAAAAAAAAAAEAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAgAAAAIAAAAAACRlZHRzAAAAHGVsc3QAAAAAAAAAAQAAAGQAAAAAAAEAAAAAAZBtZGlhAAAAIG1kaGQAAAAAAAAAAAAAAAAAACgAAAAEAFXEAAAAAAAtaGRscgAAAAAAAAAAdmlkZQAAAAAAAAAAAAAAAFZpZGVvSGFuZGxlcgAAAAE7bWluZgAAABR2bWhkAAAAAQAAAAAAAAAAAAAAJGRpbmYAAAAcZHJlZgAAAAAAAAABAAAADHVybCAAAAABAAAA+3N0YmwAAACXc3RzZAAAAAAAAAABAAAAh2F2YzEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAACAAIASAAAAEgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABj//wAAAC9hdmNDAULAD//hABhnQsAP2hAAADZo4AA=" type="video/mp4">
+    </video>
+</body>
+</html>
