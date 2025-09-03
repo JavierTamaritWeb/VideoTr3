@@ -1,0 +1,33 @@
+<svg width="180" height="180" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo del icono -->
+  <defs>
+    <linearGradient id="gradiente" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <filter id="sombra">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Fondo redondeado -->
+  <rect width="100" height="100" fill="url(#gradiente)" rx="20" filter="url(#sombra)"/>
+  
+  <!-- Contenedor del vídeo -->
+  <rect x="15" y="20" width="70" height="50" fill="#ffffff" rx="8" stroke="#e5e7eb" stroke-width="1"/>
+  
+  <!-- Botón de play -->
+  <polygon points="40,35 40,55 65,45" fill="#2563eb"/>
+  
+  <!-- Ondas de sonido (representando transcripción) -->
+  <g fill="#2563eb" opacity="0.8">
+    <rect x="25" y="75" width="8" height="4" rx="2"/>
+    <rect x="35" y="73" width="8" height="8" rx="2"/>
+    <rect x="45" y="71" width="8" height="12" rx="2"/>
+    <rect x="55" y="74" width="8" height="6" rx="2"/>
+    <rect x="65" y="72" width="8" height="10" rx="2"/>
+  </g>
+  
+  <!-- Texto "TR" pequeño -->
+  <text x="50" y="95" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">TR</text>
+</svg>

@@ -2,20 +2,33 @@
   "name": "VideoTR - Transcriptor de Vídeos",
   "short_name": "VideoTR",
   "description": "Transcriptor de vídeos potente y privado que funciona completamente en tu navegador",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "orientation": "any",
   "icons": [
     {
-      "src": "/assets/logo.svg",
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
-  "categories": ["productivity", "utilities"],
+  "categories": ["productivity", "multimedia", "utilities"],
   "lang": "es",
   "dir": "ltr",
   "prefer_related_applications": false,
@@ -24,16 +37,39 @@
       "name": "Nueva transcripción",
       "short_name": "Transcribir",
       "description": "Iniciar una nueva transcripción",
-      "url": "/",
-      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+      "url": "./",
+      "icons": [{ 
+        "src": "assets/icons/icon-192.png", 
+        "sizes": "192x192",
+        "type": "image/png"
+      }]
     }
   ],
   "screenshots": [
     {
-      "src": "/assets/screenshot-1.png",
+      "src": "assets/screenshot-desktop.png",
       "sizes": "1280x720",
       "type": "image/png",
-      "label": "Pantalla principal de VideoTR"
+      "form_factor": "wide",
+      "label": "Vista de escritorio de VideoTR"
+    },
+    {
+      "src": "assets/screenshot-mobile.png", 
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista móvil de VideoTR"
+    }
+  ],
+  "related_applications": [],
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+videotr",
+      "url": "./?url=%s"
     }
   ]
 }

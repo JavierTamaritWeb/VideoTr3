@@ -8,6 +8,7 @@
 }
 
 html {
+    background-color: red;
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
@@ -24,6 +25,7 @@ body {
     background-color: var(--color-fondo);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color var(--transicion-normal), color var(--transicion-normal);
 }
 
 /* Headings */
@@ -116,10 +118,29 @@ code, pre {
     background: var(--color-texto-deshabilitado);
 }
 
+/* Scrollbar para tema oscuro */
+[data-tema="oscuro"] ::-webkit-scrollbar-track {
+    background: var(--color-fondo-terciario);
+}
+
+[data-tema="oscuro"] ::-webkit-scrollbar-thumb {
+    background: var(--color-borde-activo);
+}
+
+[data-tema="oscuro"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-texto-secundario);
+}
+
 /* Selección de texto */
 ::selection {
     background-color: var(--color-primario-claro);
     color: var(--color-texto);
+}
+
+/* Selección para tema oscuro */
+[data-tema="oscuro"] ::selection {
+    background-color: var(--color-primario);
+    color: var(--color-fondo);
 }
 
 /* Deshabilitado */

@@ -1,31 +1,33 @@
 // service-worker.js - Service Worker para PWA y caché
-const CACHE_NAME = 'videotr-v1.0.0';
+const CACHE_NAME = 'videotr-v1.1.0';
 const MODEL_CACHE_NAME = 'videotr-models-v1';
+
+// Helper para rutas relativas al scope
+const R = (p) => new URL(p, self.registration.scope).toString();
 
 // Archivos esenciales para funcionamiento offline
 const ARCHIVOS_ESENCIALES = [
-    '/',
-    '/index.html',
-    '/css/tokens.css',
-    '/css/base.css',
-    '/css/layout.css',
-    '/css/componentes.css',
-    '/js/main.js',
-    '/js/modulos/ui.js',
-    '/js/modulos/estado.js',
-    '/js/modulos/registro.js',
-    '/js/modulos/extractor-audio.js',
-    '/js/modulos/transcriptor.js',
-    '/js/modulos/motor-local.js',
-    '/js/modulos/motor-api.js',
-    '/js/modulos/exportador-txt-md.js',
-    '/js/modulos/exportador-rtf.js',
-    '/js/modulos/exportador-docx.js',
-    '/js/modulos/util-wav.js',
-    '/js/modulos/util-archivo.js',
-    '/js/workers/worker-transcribe.js',
-    '/manifest.webmanifest',
-    '/assets/logo.svg'
+    R('index.html'),
+    R('css/tokens.css'),
+    R('css/base.css'),
+    R('css/layout.css'),
+    R('css/componentes.css'),
+    R('js/main.js'),
+    R('js/modulos/ui.js'),
+    R('js/modulos/estado.js'),
+    R('js/modulos/registro.js'),
+    R('js/modulos/extractor-audio.js'),
+    R('js/modulos/transcriptor.js'),
+    R('js/modulos/motor-local.js'),
+    R('js/modulos/motor-api.js'),
+    R('js/modulos/exportador-txt-md.js'),
+    R('js/modulos/exportador-rtf.js'),
+    R('js/modulos/exportador-docx.js'),
+    R('js/modulos/util-wav.js'),
+    R('js/modulos/util-archivo.js'),
+    R('js/workers/worker-transcribe.js'),
+    R('manifest.webmanifest'),
+    R('assets/logo.svg')
 ];
 
 // Instalación del Service Worker
@@ -33,12 +35,16 @@ self.addEventListener('install', (event) => {
     console.log('Service Worker: Instalando...');
     
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Service Worker: Cacheando archivos esenciales');
-                return cache.addAll(ARCHIVOS_ESENCIALES);
-            })
-            .then(() => self.skipWaiting())
+        caches.open(CACHE_NAME).then(async cache => {
+            console.log('Service Worker: Precacheando archivos esenciales...');
+            try { 
+                await cache.addAll(ARCHIVOS_ESENCIALES);
+                console.log('Service Worker: Precache completado');
+            }
+            catch (e) { 
+                console.warn('Service Worker: Precache parcial:', e.message); 
+            }
+        }).then(() => self.skipWaiting())
     );
 });
 
@@ -145,4 +151,127 @@ self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
+    
+    // Gestión de caché avanzada
+    if (event.data && event.data.type === 'GET_CACHE_INFO') {
+        getCacheInfo().then(info => {
+            event.ports[0].postMessage({ success: true, cacheInfo: info });
+        }).catch(error => {
+            event.ports[0].postMessage({ success: false, error: error.message });
+        });
+    }
+    
+    if (event.data && event.data.type === 'CLEAR_SPECIFIC_CACHE') {
+        const { cacheName } = event.data;
+        caches.delete(cacheName).then(success => {
+            event.ports[0].postMessage({ 
+                success, 
+                message: success ? `Caché ${cacheName} eliminada` : `Error eliminando caché ${cacheName}` 
+            });
+        });
+    }
+});
+
+// === FUNCIONES AUXILIARES ===
+
+// Obtener información detallada de caché
+async function getCacheInfo() {
+    const cacheNames = await caches.keys();
+    const cacheInfo = [];
+    
+    for (const cacheName of cacheNames) {
+        const cache = await caches.open(cacheName);
+        const keys = await cache.keys();
+        const size = keys.length;
+        
+        // Calcular tamaño aproximado
+        let estimatedSize = 0;
+        for (const request of keys) {
+            const response = await cache.match(request);
+            if (response && response.headers.get('content-length')) {
+                estimatedSize += parseInt(response.headers.get('content-length'));
+            }
+        }
+        
+        cacheInfo.push({
+            name: cacheName,
+            entries: size,
+            estimatedSize: estimatedSize,
+            lastModified: new Date().toISOString()
+        });
+    }
+    
+    return cacheInfo;
+}
+
+// Función para limpiar cachés obsoletas
+async function cleanupOldCaches() {
+    const cacheNames = await caches.keys();
+    const currentCaches = [CACHE_NAME, MODEL_CACHE_NAME];
+    
+    return Promise.all(
+        cacheNames.map(cacheName => {
+            if (!currentCaches.includes(cacheName)) {
+                console.log('Service Worker: Limpiando caché obsoleta:', cacheName);
+                return caches.delete(cacheName);
+            }
+        })
+    );
+}
+
+// Función para verificar disponibilidad offline
+self.addEventListener('online', () => {
+    console.log('Service Worker: Conectividad restaurada');
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+            client.postMessage({ 
+                type: 'NETWORK_STATUS', 
+                online: true,
+                message: 'Conexión a internet restaurada'
+            });
+        });
+    });
+});
+
+self.addEventListener('offline', () => {
+    console.log('Service Worker: Modo offline activado');
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+            client.postMessage({ 
+                type: 'NETWORK_STATUS', 
+                online: false,
+                message: 'Trabajando en modo offline'
+            });
+        });
+    });
+});
+
+// Error handling mejorado
+self.addEventListener('error', (event) => {
+    console.error('Service Worker error:', event.error);
+    
+    // Reportar errores críticos al cliente
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+            client.postMessage({
+                type: 'SERVICE_WORKER_ERROR',
+                error: event.error.message,
+                stack: event.error.stack
+            });
+        });
+    });
+});
+
+// Manejo de actualizaciones automáticas
+self.addEventListener('updatefound', () => {
+    console.log('Service Worker: Nueva versión encontrada');
+    
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+            client.postMessage({
+                type: 'UPDATE_AVAILABLE',
+                message: 'Nueva versión disponible. Recarga la página para actualizar.'
+            });
+        });
+    });
 });

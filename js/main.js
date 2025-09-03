@@ -35,13 +35,16 @@ class VideoTR {
         // Configurar event listeners
         this.configurarEventListeners();
         
+        // Configurar listener para cambios en el tema del sistema
+        this.configurarListenerTemaServicio();
+        
         // Cargar configuración guardada
         this.cargarConfiguracion();
         
         // Registrar Service Worker para PWA
         if ('serviceWorker' in navigator) {
             try {
-                await navigator.serviceWorker.register('/service-worker.js');
+                await navigator.serviceWorker.register('/service-worker-dev.js');
                 console.log('Service Worker registrado');
             } catch (error) {
                 console.log('Error registrando Service Worker:', error);
@@ -149,6 +152,14 @@ class VideoTR {
         
         // Panel de pruebas
         this.configurarPanelPruebas();
+        
+        // Atajo de teclado para cambiar tema (Ctrl+Shift+T)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                this.cambiarTemaRapido();
+            }
+        });
     }
     
     configurarModales() {
@@ -169,6 +180,14 @@ class VideoTR {
             modalConfiguracion.classList.add('modal--abierta');
         });
         
+        // Botón de cambio rápido de tema
+        const btnCambiarTema = document.getElementById('btn-cambiar-tema');
+        if (btnCambiarTema) {
+            btnCambiarTema.addEventListener('click', () => {
+                this.cambiarTemaRapido();
+            });
+        }
+        
         // Cerrar modales
         document.querySelectorAll('.modal__cerrar').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -188,6 +207,15 @@ class VideoTR {
         // Configuración
         document.getElementById('config-tema').addEventListener('change', (e) => {
             this.cambiarTema(e.target.value);
+            this.actualizarIconoTema(e.target.value);
+            
+            // Mostrar notificación de cambio
+            const temas = {
+                'auto': 'Automático (sigue el sistema)',
+                'claro': 'Modo claro',
+                'oscuro': 'Modo oscuro'
+            };
+            mostrarNotificacion(`Tema cambiado a: ${temas[e.target.value]}`, 'exito', 2000);
         });
         
         document.getElementById('btn-limpiar-cache').addEventListener('click', async () => {
@@ -216,6 +244,137 @@ class VideoTR {
                 mostrarNotificacion('Registro limpiado', 'info');
             }
         });
+        
+        // === MEJORAS DE ACCESIBILIDAD ===
+        this.configurarNavegacionTeclado();
+        this.configurarGestionFocus();
+        this.configurarAnunciosARIA();
+    }
+    
+    configurarNavegacionTeclado() {
+        // Navegación por teclado en la zona de subida
+        const zonaSoltar = document.getElementById('zona-soltar');
+        zonaSoltar.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                document.getElementById('selector-archivo').click();
+            }
+        });
+        
+        // Atajos de teclado globales
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + U para subir archivo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+                e.preventDefault();
+                document.getElementById('selector-archivo').click();
+            }
+            
+            // Ctrl/Cmd + Enter para transcribir
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const btnTranscribir = document.getElementById('btn-transcribir');
+                if (!btnTranscribir.disabled) {
+                    this.iniciarTranscripcion();
+                }
+            }
+            
+            // Escape para cerrar modales
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal--abierta').forEach(modal => {
+                    modal.classList.remove('modal--abierta');
+                });
+            }
+            
+            // Ctrl/Cmd + / para mostrar ayuda de atajos
+            if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+                e.preventDefault();
+                this.mostrarAyudaAtajos();
+            }
+        });
+    }
+    
+    configurarGestionFocus() {
+        // Gestión de focus en modales
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('transitionend', (e) => {
+                if (e.target === modal && modal.classList.contains('modal--abierta')) {
+                    // Enfocar primer elemento focusable del modal
+                    const primerElemento = modal.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (primerElemento) {
+                        primerElemento.focus();
+                    }
+                }
+            });
+        });
+        
+        // Trap de focus en modales
+        document.addEventListener('keydown', (e) => {
+            const modalAbierto = document.querySelector('.modal--abierta');
+            if (!modalAbierto || e.key !== 'Tab') return;
+            
+            const elementosFocusables = modalAbierto.querySelectorAll(
+                'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            
+            if (elementosFocusables.length === 0) return;
+            
+            const primero = elementosFocusables[0];
+            const ultimo = elementosFocusables[elementosFocusables.length - 1];
+            
+            if (e.shiftKey) {
+                // Shift + Tab
+                if (document.activeElement === primero) {
+                    e.preventDefault();
+                    ultimo.focus();
+                }
+            } else {
+                // Tab
+                if (document.activeElement === ultimo) {
+                    e.preventDefault();
+                    primero.focus();
+                }
+            }
+        });
+    }
+    
+    configurarAnunciosARIA() {
+        // Región para anuncios dinámicos
+        if (!document.getElementById('anuncios-aria')) {
+            const regionAnuncios = document.createElement('div');
+            regionAnuncios.id = 'anuncios-aria';
+            regionAnuncios.setAttribute('aria-live', 'polite');
+            regionAnuncios.setAttribute('aria-atomic', 'true');
+            regionAnuncios.className = 'sr-only';
+            document.body.appendChild(regionAnuncios);
+        }
+    }
+    
+    anunciarARIA(mensaje, prioridad = 'polite') {
+        const regionAnuncios = document.getElementById('anuncios-aria');
+        if (regionAnuncios) {
+            regionAnuncios.setAttribute('aria-live', prioridad);
+            regionAnuncios.textContent = mensaje;
+            
+            // Limpiar después de un tiempo para permitir nuevos anuncios
+            setTimeout(() => {
+                regionAnuncios.textContent = '';
+            }, 1000);
+        }
+    }
+    
+    mostrarAyudaAtajos() {
+        const atajos = `
+Atajos de teclado disponibles:
+
+Ctrl/Cmd + U: Subir archivo
+Ctrl/Cmd + Enter: Iniciar transcripción
+Escape: Cerrar modales
+Ctrl/Cmd + /: Mostrar esta ayuda
+Tab: Navegar entre elementos
+Enter/Espacio: Activar botones y zona de subida
+        `.trim();
+        
+        alert(atajos);
     }
     
     configurarPanelPruebas() {
@@ -293,6 +452,88 @@ class VideoTR {
         document.getElementById('tarjeta-video').classList.add('tarjeta-video--oculta');
         document.getElementById('btn-transcribir').disabled = true;
         document.getElementById('selector-archivo').value = '';
+        
+        // Anunciar limpieza
+        this.anunciarARIA('Vídeo eliminado, seleccione un nuevo archivo');
+    }
+    
+    validarArchivo(archivo) {
+        // Validaciones de seguridad y compatibilidad
+        const formatosPermitidos = [
+            'video/mp4', 'video/webm', 'video/avi', 'video/quicktime', 
+            'video/x-msvideo', 'video/x-matroska', 'video/x-ms-wmv',
+            'video/x-flv', 'video/ogg'
+        ];
+        
+        const tamañoMaximo = 2 * 1024 * 1024 * 1024; // 2GB
+        const tamañoMinimo = 1024; // 1KB
+        
+        if (!archivo) {
+            return { valido: false, mensaje: 'No se ha seleccionado ningún archivo' };
+        }
+        
+        if (!archivo.type.startsWith('video/')) {
+            return { valido: false, mensaje: 'El archivo seleccionado no es un vídeo' };
+        }
+        
+        if (!formatosPermitidos.includes(archivo.type)) {
+            return { 
+                valido: false, 
+                mensaje: `Formato ${archivo.type} no soportado. Use MP4, WebM, AVI, MOV, MKV, WMV, FLV u OGV` 
+            };
+        }
+        
+        if (archivo.size > tamañoMaximo) {
+            return { 
+                valido: false, 
+                mensaje: `El archivo es demasiado grande. Máximo 2GB permitido` 
+            };
+        }
+        
+        if (archivo.size < tamañoMinimo) {
+            return { 
+                valido: false, 
+                mensaje: 'El archivo parece estar dañado o vacío' 
+            };
+        }
+        
+        // Validar nombre de archivo
+        if (archivo.name.length > 255) {
+            return { 
+                valido: false, 
+                mensaje: 'El nombre del archivo es demasiado largo' 
+            };
+        }
+        
+        return { valido: true, mensaje: 'Archivo válido' };
+    }
+    
+    actualizarInformacionVideo(archivo) {
+        const elementos = {
+            'video-nombre': archivo.name,
+            'video-tamaño': `${(archivo.size / 1024 / 1024).toFixed(2)} MB`,
+            'video-formato': archivo.type.split('/')[1].toUpperCase()
+        };
+        
+        Object.entries(elementos).forEach(([id, valor]) => {
+            const elemento = document.getElementById(id);
+            if (elemento) {
+                elemento.textContent = valor;
+                
+                // Añadir título para tooltips
+                if (id === 'video-nombre' && valor.length > 50) {
+                    elemento.title = valor;
+                }
+            }
+        });
+        
+        // Actualizar aria-label de la tarjeta
+        const tarjeta = document.getElementById('tarjeta-video');
+        if (tarjeta) {
+            tarjeta.setAttribute('aria-label', 
+                `Vídeo cargado: ${archivo.name}, ${elementos['video-tamaño']}, formato ${elementos['video-formato']}`
+            );
+        }
     }
     
     async iniciarTranscripcion() {
@@ -500,18 +741,130 @@ class VideoTR {
     }
     
     cambiarTema(tema) {
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        
         if (tema === 'auto') {
             document.body.removeAttribute('data-tema');
+            // Detectar preferencia del sistema
+            const prefiereTemaOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            metaThemeColor.content = prefiereTemaOscuro ? '#1e293b' : '#2563eb';
+        } else if (tema === 'oscuro') {
+            document.body.setAttribute('data-tema', tema);
+            metaThemeColor.content = '#1e293b';
         } else {
             document.body.setAttribute('data-tema', tema);
+            metaThemeColor.content = '#2563eb';
         }
+        
         localStorage.setItem('tema', tema);
+        
+        // Actualizar el estado global
+        this.estado.set('tema', tema);
+    }
+    
+    cambiarTemaRapido() {
+        const temaActual = localStorage.getItem('tema') || 'auto';
+        let nuevoTema;
+        
+        switch (temaActual) {
+            case 'auto':
+                nuevoTema = 'claro';
+                break;
+            case 'claro':
+                nuevoTema = 'oscuro';
+                break;
+            case 'oscuro':
+                nuevoTema = 'auto';
+                break;
+            default:
+                nuevoTema = 'auto';
+        }
+        
+        this.cambiarTema(nuevoTema);
+        // También actualizar el selector en configuración
+        document.getElementById('config-tema').value = nuevoTema;
+        this.actualizarIconoTema(nuevoTema);
+        
+        // Mostrar notificación y anunciar para lectores de pantalla
+        const temas = {
+            'auto': '🔄 Automático (sigue el sistema)',
+            'claro': '☀️ Modo claro',
+            'oscuro': '🌙 Modo oscuro'
+        };
+        
+        const mensaje = `Tema cambiado a ${temas[nuevoTema]}`;
+        mostrarNotificacion(mensaje, 'exito', 2000);
+        this.anunciarARIA(mensaje);
+        
+        // Actualizar atributos de accesibilidad del botón
+        this.actualizarAccesibilidadBotonTema(nuevoTema);
+    }
+    
+    actualizarAccesibilidadBotonTema(tema) {
+        const botonTema = document.getElementById('btn-cambiar-tema');
+        const textoTema = document.getElementById('texto-tema');
+        
+        if (!botonTema) return;
+        
+        const temas = {
+            'auto': 'Automático',
+            'claro': 'Claro', 
+            'oscuro': 'Oscuro'
+        };
+        
+        const siguienteTemas = {
+            'auto': 'claro',
+            'claro': 'oscuro',
+            'oscuro': 'automático'
+        };
+        
+        const temaTexto = temas[tema] || 'Automático';
+        const siguienteTema = siguienteTemas[tema] || 'automático';
+        
+        botonTema.setAttribute('aria-label', `Cambiar tema de ${temaTexto.toLowerCase()} a ${siguienteTema}`);
+        botonTema.setAttribute('title', `Tema actual: ${temaTexto}. Clic para cambiar a ${siguienteTema}`);
+        
+        if (textoTema) {
+            textoTema.textContent = temaTexto;
+        }
+    }
+    
+    actualizarIconoTema(tema) {
+        const icono = document.getElementById('icono-tema');
+        
+        if (!icono) {
+            console.warn('Icono de tema no encontrado');
+            return;
+        }
+        
+        if (tema === 'oscuro' || (tema === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            icono.textContent = '☀️';
+        } else {
+            icono.textContent = '🌙';
+        }
+    }
+    
+    configurarListenerTemaServicio() {
+        // Escuchar cambios en la preferencia del tema del sistema
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        mediaQuery.addListener(() => {
+            const temaActual = localStorage.getItem('tema') || 'auto';
+            if (temaActual === 'auto') {
+                this.cambiarTema('auto'); // Reaplica el tema automático
+                this.actualizarIconoTema('auto'); // Actualiza el icono
+            }
+        });
     }
     
     cargarConfiguracion() {
+        console.log('Cargando configuración...');
         const tema = localStorage.getItem('tema') || 'auto';
+        console.log('Tema actual:', tema);
         document.getElementById('config-tema').value = tema;
         this.cambiarTema(tema);
+        this.actualizarIconoTema(tema);
+        console.log('Icono de tema actualizado para:', tema);
         
         const webgpu = localStorage.getItem('webgpu') !== 'false';
         document.getElementById('config-webgpu').checked = webgpu;
@@ -613,9 +966,200 @@ class VideoTR {
             resultados.innerHTML = `<div style="color: var(--color-error);">✗ Error validando WAV: ${error.message}</div>`;
         }
     }
+    
+    // === GESTIÓN PWA Y CONECTIVIDAD ===
+    
+    configurarPWA() {
+        // Escuchar mensajes del Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                this.manejarMensajeServiceWorker(event);
+            });
+            
+            // Detectar actualizaciones de la PWA
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                this.anunciarARIA('Aplicación actualizada. Recarga para ver los cambios.');
+                mostrarNotificacion('Nueva versión disponible', 'info');
+            });
+        }
+        
+        // Detectar cambios de conectividad
+        window.addEventListener('online', () => {
+            this.manejarCambioConectividad(true);
+        });
+        
+        window.addEventListener('offline', () => {
+            this.manejarCambioConectividad(false);
+        });
+        
+        // Configurar instalación de PWA
+        this.configurarInstalacionPWA();
+    }
+    
+    manejarMensajeServiceWorker(event) {
+        const { data } = event;
+        
+        switch (data.type) {
+            case 'NETWORK_STATUS':
+                const mensaje = data.online ? 
+                    'Conexión restaurada - Funciones completas disponibles' :
+                    'Modo offline - Funcionalidad limitada';
+                mostrarNotificacion(mensaje, data.online ? 'exito' : 'info');
+                this.anunciarARIA(mensaje);
+                break;
+                
+            case 'UPDATE_AVAILABLE':
+                mostrarNotificacion(data.message, 'info');
+                break;
+                
+            case 'SERVICE_WORKER_ERROR':
+                console.error('Service Worker Error:', data.error);
+                mostrarNotificacion('Error en el Service Worker', 'error');
+                break;
+        }
+    }
+    
+    manejarCambioConectividad(online) {
+        const indicadorConectividad = document.getElementById('indicador-conectividad') || 
+            this.crearIndicadorConectividad();
+            
+        if (online) {
+            indicadorConectividad.textContent = '🌐 Online';
+            indicadorConectividad.className = 'indicador-conectividad online';
+            this.anunciarARIA('Conexión a internet restaurada');
+        } else {
+            indicadorConectividad.textContent = '📴 Offline';
+            indicadorConectividad.className = 'indicador-conectividad offline';
+            this.anunciarARIA('Conexión perdida. Trabajando en modo offline');
+        }
+        
+        // Auto-ocultar después de 3 segundos
+        setTimeout(() => {
+            indicadorConectividad.style.opacity = '0';
+            setTimeout(() => {
+                if (indicadorConectividad.parentNode) {
+                    indicadorConectividad.parentNode.removeChild(indicadorConectividad);
+                }
+            }, 300);
+        }, 3000);
+    }
+    
+    crearIndicadorConectividad() {
+        const indicador = document.createElement('div');
+        indicador.id = 'indicador-conectividad';
+        indicador.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--color-fondo-modal);
+            color: var(--color-texto);
+            padding: var(--espacio-s) var(--espacio-m);
+            border-radius: var(--radio-m);
+            box-shadow: var(--sombra-l);
+            font-size: var(--tamaño-texto-s);
+            font-weight: var(--peso-medio);
+            z-index: 10000;
+            transition: opacity 0.3s ease;
+            border: 1px solid var(--color-borde);
+        `;
+        
+        document.body.appendChild(indicador);
+        return indicador;
+    }
+    
+    configurarInstalacionPWA() {
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            this.mostrarBotonInstalacion();
+        });
+        
+        // Crear botón de instalación
+        const botonInstalar = document.createElement('button');
+        botonInstalar.id = 'btn-instalar-pwa';
+        botonInstalar.className = 'boton boton--primario';
+        botonInstalar.innerHTML = '📱 Instalar App';
+        botonInstalar.style.display = 'none';
+        botonInstalar.setAttribute('aria-label', 'Instalar VideoTR como aplicación');
+        
+        botonInstalar.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    this.anunciarARIA('VideoTR instalado correctamente');
+                    mostrarNotificacion('¡App instalada!', 'exito');
+                } else {
+                    this.anunciarARIA('Instalación cancelada');
+                }
+                
+                deferredPrompt = null;
+                botonInstalar.style.display = 'none';
+            }
+        });
+        
+        // Añadir a la navegación
+        const navegacion = document.querySelector('.barra-cabecera__navegacion');
+        if (navegacion) {
+            navegacion.appendChild(botonInstalar);
+        }
+        
+        this.botonInstalacion = botonInstalar;
+    }
+    
+    mostrarBotonInstalacion() {
+        if (this.botonInstalacion) {
+            this.botonInstalacion.style.display = 'inline-flex';
+            this.anunciarARIA('VideoTR puede instalarse como aplicación');
+        }
+    }
+    
+    // Información del sistema para debugging
+    obtenerInformacionSistema() {
+        return {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            cookiesEnabled: navigator.cookieEnabled,
+            onLine: navigator.onLine,
+            serviceWorkerSupported: 'serviceWorker' in navigator,
+            indexedDBSupported: 'indexedDB' in window,
+            webAudioSupported: 'AudioContext' in window || 'webkitAudioContext' in window,
+            fileAPISupported: 'File' in window && 'FileReader' in window,
+            timestamp: new Date().toISOString()
+        };
+    }
 }
+
 
 // Inicializar aplicación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-    window.videoTR = new VideoTR();
+    const app = new VideoTR();
+    
+    // Configurar PWA después de la inicialización
+    app.configurarPWA();
+    
+    // Hacer disponible globalmente para debugging
+    window.videoTR = app;
+    
+    // Debug: Mostrar información del sistema en consola
+    console.log('VideoTR System Info:', app.obtenerInformacionSistema());
+});
+
+// Manejo global de errores no capturados
+window.addEventListener('error', (event) => {
+    console.error('Error no capturado:', event.error);
+    
+    if (window.videoTR && window.videoTR.anunciarARIA) {
+        window.videoTR.anunciarARIA('Ha ocurrido un error. Revisa la consola para más detalles.', 'assertive');
+    }
+});
+
+// Manejo global de promesas rechazadas
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Promesa rechazada no manejada:', event.reason);
+    event.preventDefault(); // Evitar que se muestre en consola como error no manejado
 });

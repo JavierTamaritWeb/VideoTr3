@@ -47,6 +47,24 @@
 .barra-cabecera__navegacion {
     display: flex;
     gap: var(--espacio-s);
+    align-items: center;
+}
+
+.barra-cabecera__indicador-tema {
+    display: none;
+    font-size: var(--tamaño-texto-xs);
+    color: var(--color-texto-secundario);
+    padding: var(--espacio-xxs) var(--espacio-xs);
+    background-color: var(--color-fondo-terciario);
+    border-radius: var(--radio-s);
+    border: 1px solid var(--color-borde);
+    transition: all var(--transicion-rapida);
+}
+
+@media (min-width: 768px) {
+    .barra-cabecera__indicador-tema {
+        display: block;
+    }
 }
 
 /* Área de trabajo */

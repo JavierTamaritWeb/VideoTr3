@@ -1,4 +1,19 @@
 {
-    "liveServer.settings.port": 0,
-    "liveServer.settings.multiRootWorkspaceName": "Videotr3"
+    "liveServer.settings.port": 8007,
+    "liveServer.settings.multiRootWorkspaceName": "",
+    "liveServer.settings.donotShowInfoMsg": true,
+    "liveServer.settings.donotVerifyTags": true,
+    "liveServer.settings.fullReload": true,
+    "liveServer.settings.wait": 100,
+    "liveServer.settings.CustomBrowser": "chrome",
+    "liveServer.settings.advanceCustomBrowserCmdLine": "--disable-web-security --auto-open-devtools-for-tabs",
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 500,
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/objects/**": true,
+        "**/dist/**": true,
+        "**/build/**": true,
+        "**/.DS_Store": true
+    }
 }

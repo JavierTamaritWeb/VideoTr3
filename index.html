@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="VideoTR - Transcriptor de vídeos en el navegador">
+    <meta name="description" content="VideoTR - Transcriptor de vídeos en el navegador con IA, privacidad garantizada">
     <meta name="theme-color" content="#2563eb">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- CSP para seguridad -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; font-src 'self';">
     
     <title>VideoTR - Transcriptor de Vídeos [ACTUALIZADO]</title>
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
-    <link rel="apple-touch-icon" href="assets/logo.svg">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png">
+    <link rel="icon" sizes="192x192" href="assets/icons/icon-192.png">
+    <link rel="icon" sizes="512x512" href="assets/icons/icon-512.png">
     
     <!-- CSS -->
     <link rel="stylesheet" href="css/tokens.css">
@@ -21,79 +27,115 @@
     
     <!-- ES Modules -->
     <script type="module" src="js/main.js"></script>
+    <!-- Scripts de desarrollo -->
+    <script src="dev-shortcuts.js"></script>
 </head>
 <body class="aplicacion">
+    <!-- Skip to main content para accesibilidad -->
+    <a href="#contenido-principal" class="enlace-saltar">Saltar al contenido principal</a>
+    
     <!-- Cabecera -->
-    <header class="barra-cabecera">
+    <header class="barra-cabecera" role="banner">
         <div class="barra-cabecera__contenedor">
             <div class="barra-cabecera__marca">
                 <img src="assets/logo.svg" alt="VideoTR" class="barra-cabecera__logo">
                 <h1 class="barra-cabecera__titulo">VideoTR v3.0</h1>
             </div>
-            <nav class="barra-cabecera__navegacion">
-                <button class="boton boton--icono" id="btn-registro" aria-label="Ver registro">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <nav class="barra-cabecera__navegacion" role="navigation" aria-label="Navegación principal">
+                <button class="boton boton--secundario" id="btn-cambiar-tema" 
+                        aria-label="Cambiar tema de claro a oscuro" 
+                        aria-pressed="false"
+                        title="Cambiar tema">
+                    <span id="icono-tema" aria-hidden="true">🌙</span> 
+                    <span class="sr-only">Tema:</span> 
+                    <span id="texto-tema">Claro</span>
+                </button>
+                <button class="boton boton--icono" id="btn-registro" 
+                        aria-label="Ver registro de transcripciones"
+                        aria-describedby="tooltip-registro">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
-                    Registro
+                    <span class="boton__texto">Registro</span>
+                    <div id="tooltip-registro" role="tooltip" class="tooltip">Ver historial de transcripciones</div>
                 </button>
-                <button class="boton boton--icono" id="btn-configuracion" aria-label="Configuración">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <button class="boton boton--icono" id="btn-configuracion" 
+                        aria-label="Abrir configuración de transcripción"
+                        aria-describedby="tooltip-config">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <circle cx="12" cy="12" r="3"/>
                         <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 8.78l4.24 4.24M20.46 15.22l-4.24-4.24M8.78 22.46l-4.24-4.24"/>
                     </svg>
-                    Ajustes
+                    <span class="boton__texto">Ajustes</span>
+                    <div id="tooltip-config" role="tooltip" class="tooltip">Configurar opciones de transcripción</div>
                 </button>
-                <button class="boton boton--icono" id="btn-pruebas" aria-label="Panel de pruebas">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <button class="boton boton--icono" id="btn-pruebas" 
+                        aria-label="Panel de pruebas técnicas"
+                        aria-describedby="tooltip-pruebas">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M9 11l3 3L22 4"/>
                         <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
                     </svg>
-                    Pruebas
+                    <span class="boton__texto">Pruebas</span>
+                    <div id="tooltip-pruebas" role="tooltip" class="tooltip">Acceder a herramientas de desarrollo</div>
                 </button>
             </nav>
         </div>
     </header>
 
     <!-- Área principal -->
-    <main class="area-trabajo">
+    <main id="contenido-principal" class="area-trabajo" role="main">
         <!-- Panel de entrada -->
-        <section class="panel-entrada" aria-label="Entrada de vídeo">
+        <section class="panel-entrada" aria-labelledby="titulo-entrada" role="region">
             <div class="panel-entrada__cabecera">
-                <h2 class="panel-entrada__titulo">Entrada</h2>
+                <h2 id="titulo-entrada" class="panel-entrada__titulo">Entrada de Vídeo</h2>
             </div>
             
             <!-- Zona de arrastrar y soltar -->
-            <div class="panel-entrada__zona-soltar" id="zona-soltar">
-                <svg class="panel-entrada__icono-upload" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <div class="panel-entrada__zona-soltar" 
+                 id="zona-soltar"
+                 role="button"
+                 tabindex="0"
+                 aria-describedby="instrucciones-subida formatos-soportados"
+                 aria-label="Área para subir vídeo mediante arrastrar y soltar o selección de archivo">
+                <svg class="panel-entrada__icono-upload" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                <p class="panel-entrada__instruccion">
-                    Arrastra un vídeo aquí o 
+                <p id="instrucciones-subida" class="panel-entrada__instruccion">
+                    <span>Arrastra un vídeo aquí o </span>
                     <label for="selector-archivo" class="panel-entrada__selector-label">
-                        selecciona uno
+                        selecciona un archivo
                     </label>
                 </p>
-                <div class="panel-entrada__formatos">
+                <div id="formatos-soportados" class="panel-entrada__formatos" aria-live="polite">
                     <p class="panel-entrada__formatos-titulo">Formatos soportados:</p>
-                    <div class="panel-entrada__formatos-lista">
-                        <span class="formato-tag">MP4</span>
-                        <span class="formato-tag">WebM</span>
-                        <span class="formato-tag">AVI</span>
-                        <span class="formato-tag">MOV</span>
-                        <span class="formato-tag">MKV</span>
-                        <span class="formato-tag">WMV</span>
-                        <span class="formato-tag">FLV</span>
-                        <span class="formato-tag">OGV</span>
+                    <div class="panel-entrada__formatos-lista" role="list" aria-label="Lista de formatos de vídeo compatibles">
+                        <span class="formato-tag" role="listitem">MP4</span>
+                        <span class="formato-tag" role="listitem">WebM</span>
+                        <span class="formato-tag" role="listitem">AVI</span>
+                        <span class="formato-tag" role="listitem">MOV</span>
+                        <span class="formato-tag" role="listitem">MKV</span>
+                        <span class="formato-tag" role="listitem">WMV</span>
+                        <span class="formato-tag" role="listitem">FLV</span>
+                        <span class="formato-tag" role="listitem">OGV</span>
                     </div>
                 </div>
-                <input type="file" id="selector-archivo" accept="video/*" class="panel-entrada__selector-archivo">
+                <input type="file" 
+                       id="selector-archivo" 
+                       accept="video/*,.mp4,.webm,.avi,.mov,.mkv,.wmv,.flv,.ogv" 
+                       class="panel-entrada__selector-archivo"
+                       aria-describedby="instrucciones-subida formatos-soportados"
+                       aria-label="Seleccionar archivo de vídeo para transcribir">
             </div>
 
             <!-- Tarjeta de vídeo cargado -->
-            <div class="tarjeta-video tarjeta-video--oculta" id="tarjeta-video">
+            <div class="tarjeta-video tarjeta-video--oculta" 
+                 id="tarjeta-video"
+                 role="region"
+                 aria-labelledby="titulo-video-cargado"
+                 aria-live="polite">
                 <div class="tarjeta-video__miniatura-contenedor">
                     <video class="tarjeta-video__miniatura" id="video-miniatura"></video>
                     <div class="tarjeta-video__duracion" id="video-duracion">00:00</div>

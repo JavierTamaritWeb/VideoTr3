@@ -119,6 +119,19 @@
         --color-primario-activo: #93c5fd;
         --color-primario-claro: #1e3a8a;
         
+        --color-secundario: #64748b;
+        --color-secundario-hover: #94a3b8;
+        --color-secundario-activo: #cbd5e1;
+        
+        --color-exito: #34d399;
+        --color-exito-claro: #064e3b;
+        --color-advertencia: #fbbf24;
+        --color-advertencia-claro: #451a03;
+        --color-error: #f87171;
+        --color-error-claro: #7f1d1d;
+        --color-info: #60a5fa;
+        --color-info-claro: #1e3a8a;
+        
         --color-borde: #334155;
         --color-borde-activo: #475569;
     }
@@ -141,6 +154,53 @@
     --color-primario-activo: #93c5fd;
     --color-primario-claro: #1e3a8a;
     
+    --color-secundario: #64748b;
+    --color-secundario-hover: #94a3b8;
+    --color-secundario-activo: #cbd5e1;
+    
+    --color-exito: #34d399;
+    --color-exito-claro: #064e3b;
+    --color-advertencia: #fbbf24;
+    --color-advertencia-claro: #451a03;
+    --color-error: #f87171;
+    --color-error-claro: #7f1d1d;
+    --color-info: #60a5fa;
+    --color-info-claro: #1e3a8a;
+    
     --color-borde: #334155;
     --color-borde-activo: #475569;
+}
+
+/* Tema claro manual */
+[data-tema="claro"] {
+    --color-fondo: #ffffff;
+    --color-fondo-secundario: #f8fafc;
+    --color-fondo-terciario: #f1f5f9;
+    --color-superficie: #ffffff;
+    --color-superficie-elevada: #ffffff;
+    
+    --color-texto: #0f172a;
+    --color-texto-secundario: #475569;
+    --color-texto-deshabilitado: #94a3b8;
+    
+    --color-primario: #2563eb;
+    --color-primario-hover: #1d4ed8;
+    --color-primario-activo: #1e40af;
+    --color-primario-claro: #dbeafe;
+    
+    --color-secundario: #64748b;
+    --color-secundario-hover: #475569;
+    --color-secundario-activo: #334155;
+    
+    --color-exito: #10b981;
+    --color-exito-claro: #d1fae5;
+    --color-advertencia: #f59e0b;
+    --color-advertencia-claro: #fed7aa;
+    --color-error: #ef4444;
+    --color-error-claro: #fee2e2;
+    --color-info: #3b82f6;
+    --color-info-claro: #dbeafe;
+    
+    --color-borde: #e2e8f0;
+    --color-borde-activo: #cbd5e1;
 }

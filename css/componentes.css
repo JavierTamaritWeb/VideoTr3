@@ -644,3 +644,160 @@
         max-width: 100%;
     }
 }
+
+/* === ACCESIBILIDAD === */
+
+/* Enlace para saltar al contenido principal */
+.enlace-saltar {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--color-primario);
+    color: white;
+    padding: var(--espacio-xs) var(--espacio-s);
+    border-radius: var(--radio-s);
+    text-decoration: none;
+    font-weight: var(--peso-medio);
+    z-index: 9999;
+    transition: top var(--transicion-rapida);
+}
+
+.enlace-saltar:focus {
+    top: 6px;
+}
+
+/* Texto solo para lectores de pantalla */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Tooltips para accesibilidad */
+.tooltip {
+    position: absolute;
+    background: var(--color-fondo-modal);
+    color: var(--color-texto);
+    padding: var(--espacio-xs) var(--espacio-s);
+    border-radius: var(--radio-s);
+    font-size: var(--tamaño-texto-s);
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transicion-rapida), visibility var(--transicion-rapida);
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: var(--espacio-xs);
+    border: 1px solid var(--color-borde);
+    box-shadow: var(--sombra-m);
+    pointer-events: none;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid var(--color-fondo-modal);
+}
+
+/* Mostrar tooltip en hover y focus */
+.boton:hover .tooltip,
+.boton:focus .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mejoras de contraste para modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .tooltip {
+        background: var(--color-fondo-terciario);
+        border-color: var(--color-borde);
+    }
+    
+    .tooltip::before {
+        border-bottom-color: var(--color-fondo-terciario);
+    }
+}
+
+/* Focus visible mejorado */
+.boton:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
+/* Estados ARIA */
+[aria-pressed="true"] {
+    background-color: var(--color-primario);
+    color: white;
+}
+
+/* Indicadores de estado mejorados */
+[aria-expanded="false"] + * {
+    display: none;
+}
+
+[aria-expanded="true"] + * {
+    display: block;
+}
+
+/* Mejoras para navegación por teclado en dropzone */
+.panel-entrada__zona-soltar:focus {
+    outline: 2px dashed var(--color-primario);
+    outline-offset: 4px;
+    background-color: var(--color-fondo-hover);
+}
+
+.panel-entrada__zona-soltar[aria-describedby]:hover {
+    background-color: var(--color-fondo-hover);
+}
+
+/* Responsive para tooltips en móvil */
+@media (max-width: 768px) {
+    .tooltip {
+        position: fixed;
+        top: auto;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0;
+        max-width: 280px;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .tooltip::before {
+        top: auto;
+        bottom: -5px;
+        border-top: 5px solid var(--color-fondo-modal);
+        border-bottom: none;
+    }
+}
+
+/* Animaciones respetando preferencias de movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .boton,
+    .tooltip,
+    .enlace-saltar {
+        transition: none;
+    }
+    
+    .boton:hover {
+        transform: none;
+    }
+}

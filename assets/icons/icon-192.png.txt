@@ -1,0 +1,15 @@
+# Placeholder PNG Icon - 192x192
+    
+Este archivo representa un icono PNG de 192x192 píxeles.
+En producción, este archivo debería ser reemplazado por un PNG real.
+
+Para generar el PNG real desde el SVG:
+1. Usar ImageMagick: convert icon-192.svg -resize 192x192 icon-192.png
+2. Usar herramientas online como https://convertio.co/svg-png/
+3. Usar Node.js con sharp: sharp('icon.svg').png().resize(192).toFile('icon-192.png')
+
+Características del icono:
+- Tamaño: 192x192 píxeles
+- Formato: PNG
+- Propósito: Icono de aplicación (maskable)
+- Fondo: Sólido para compatibilidad con todos los dispositivos

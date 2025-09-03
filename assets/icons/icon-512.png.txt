@@ -1,0 +1,15 @@
+# Placeholder PNG Icon - 512x512
+    
+Este archivo representa un icono PNG de 512x512 píxeles.
+En producción, este archivo debería ser reemplazado por un PNG real.
+
+Para generar el PNG real desde el SVG:
+1. Usar ImageMagick: convert icon-512.svg -resize 512x512 icon-512.png
+2. Usar herramientas online como https://convertio.co/svg-png/
+3. Usar Node.js con sharp: sharp('icon.svg').png().resize(512).toFile('icon-512.png')
+
+Características del icono:
+- Tamaño: 512x512 píxeles
+- Formato: PNG
+- Propósito: Icono de aplicación (maskable)
+- Fondo: Sólido para compatibilidad con todos los dispositivos
