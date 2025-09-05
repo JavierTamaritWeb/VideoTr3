@@ -13,6 +13,15 @@ export class UI {
             tarjetaVideo: document.getElementById('tarjeta-video'),
             videoMiniatura: document.getElementById('video-miniatura'),
             
+            // Entrada por URL
+            inputUrl: document.getElementById('input-url'),
+            btnCargarUrl: document.getElementById('btn-cargar-url'),
+            barraProgresoUrl: document.getElementById('barra-progreso-url'),
+            progresoUrlRelleno: document.getElementById('progreso-url-relleno'),
+            progresoUrlTexto: document.getElementById('progreso-url-texto'),
+            progresoUrlPorcentaje: document.getElementById('progreso-url-porcentaje'),
+            btnCancelarUrl: document.getElementById('btn-cancelar-url'),
+            
             // Progreso
             barraProgreso: document.getElementById('barra-progreso'),
             progresoRelleno: document.getElementById('progreso-relleno'),
@@ -35,8 +44,9 @@ export class UI {
             // Panel de pruebas
             panelPruebas: document.getElementById('panel-pruebas'),
             
-            // Notificaciones
-            contenedorNotificaciones: document.getElementById('contenedor-notificaciones')
+            // Notificaciones y anuncios
+            contenedorNotificaciones: document.getElementById('contenedor-notificaciones'),
+            regionAnuncios: document.getElementById('region-anuncios')
         };
     }
     
@@ -173,5 +183,69 @@ export class UI {
     
     togglePanelPruebas() {
         this.elementos.panelPruebas.classList.toggle('panel-pruebas--oculto');
+    }
+    
+    /**
+     * Anunciar mensaje de forma accesible
+     * @param {string} mensaje - Mensaje a anunciar
+     */
+    anunciar(mensaje) {
+        if (this.elementos.regionAnuncios) {
+            this.elementos.regionAnuncios.textContent = mensaje;
+        }
+    }
+    
+    /**
+     * Actualizar progreso de carga de URL
+     * @param {number} porcentaje - Porcentaje de progreso (0-100)
+     * @param {string} texto - Texto descriptivo del progreso
+     */
+    actualizarProgresoUrl(porcentaje, texto = '') {
+        if (this.elementos.progresoUrlRelleno) {
+            this.elementos.progresoUrlRelleno.style.width = `${porcentaje}%`;
+        }
+        if (this.elementos.progresoUrlPorcentaje) {
+            this.elementos.progresoUrlPorcentaje.textContent = `${Math.round(porcentaje)}%`;
+        }
+        if (texto && this.elementos.progresoUrlTexto) {
+            this.elementos.progresoUrlTexto.textContent = texto;
+        }
+    }
+    
+    /**
+     * Mostrar barra de progreso de URL
+     */
+    mostrarBarraProgresoUrl() {
+        if (this.elementos.barraProgresoUrl) {
+            this.elementos.barraProgresoUrl.classList.remove('barra-progreso--oculta');
+        }
+    }
+    
+    /**
+     * Ocultar barra de progreso de URL
+     */
+    ocultarBarraProgresoUrl() {
+        if (this.elementos.barraProgresoUrl) {
+            this.elementos.barraProgresoUrl.classList.add('barra-progreso--oculta');
+        }
+    }
+    
+    /**
+     * Habilitar/deshabilitar botón de carga de URL
+     * @param {boolean} habilitado - Si el botón debe estar habilitado
+     */
+    toggleBotonCargarUrl(habilitado) {
+        if (this.elementos.btnCargarUrl) {
+            this.elementos.btnCargarUrl.disabled = !habilitado;
+        }
+    }
+    
+    /**
+     * Limpiar campo de URL
+     */
+    limpiarUrl() {
+        if (this.elementos.inputUrl) {
+            this.elementos.inputUrl.value = '';
+        }
     }
 }

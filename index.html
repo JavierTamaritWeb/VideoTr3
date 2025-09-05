@@ -8,7 +8,7 @@
     <meta name="color-scheme" content="light dark">
     
     <!-- CSP para seguridad -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; font-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' https://www.youtube.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; font-src 'self'; frame-src https://www.youtube.com;">
     
     <title>VideoTR3 - Transcriptor de Vídeos [ACTUALIZADO]</title>
     
@@ -83,6 +83,12 @@
         </div>
     </header>
 
+    <!-- Región viva para anuncios accesibles -->
+    <div id="region-anuncios" 
+         class="sr-only" 
+         aria-live="polite" 
+         aria-atomic="true"></div>
+
     <!-- Área principal -->
     <main id="contenido-principal" class="area-trabajo" role="main">
         <!-- Panel de entrada -->
@@ -153,6 +159,50 @@
                         <line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                 </button>
+            </div>
+
+            <!-- Entrada por URL -->
+            <div class="panel-entrada__url" id="panel-url">
+                <h3 class="panel-entrada__subtitulo">Cargar desde URL</h3>
+                <div class="grupo-formulario">
+                    <label for="input-url" class="grupo-formulario__etiqueta">URL del vídeo</label>
+                    <input type="url" 
+                           id="input-url" 
+                           class="input" 
+                           placeholder="https://www.youtube.com/watch?v=..." 
+                           aria-describedby="ayuda-url">
+                    <p id="ayuda-url" class="grupo-formulario__ayuda">
+                        Soportamos YouTube, Instagram y TikTok. Límites: 10 min de duración, 100 MB de tamaño.
+                        <br><strong>Nota:</strong> Si no es posible descargar directamente por restricciones CORS/ToS, 
+                        se te guiará para subir el archivo manualmente.
+                    </p>
+                    <button class="boton boton--secundario boton--bloque" 
+                            id="btn-cargar-url" 
+                            type="button"
+                            role="button"
+                            tabindex="0"
+                            aria-describedby="ayuda-url">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        Cargar desde URL
+                    </button>
+                </div>
+                
+                <!-- Progreso de carga URL -->
+                <div class="barra-progreso barra-progreso--oculta" id="barra-progreso-url">
+                    <div class="barra-progreso__pista">
+                        <div class="barra-progreso__relleno" id="progreso-url-relleno"></div>
+                    </div>
+                    <div class="barra-progreso__info">
+                        <span class="barra-progreso__texto" id="progreso-url-texto">Cargando...</span>
+                        <span class="barra-progreso__porcentaje" id="progreso-url-porcentaje">0%</span>
+                    </div>
+                    <button class="boton boton--secundario boton--pequeno" id="btn-cancelar-url">
+                        Cancelar
+                    </button>
+                </div>
             </div>
 
             <!-- Configuración de transcripción -->
@@ -440,6 +490,9 @@
 
     <!-- Notificaciones -->
     <div class="notificaciones" id="contenedor-notificaciones" aria-live="polite"></div>
+
+    <!-- Elemento oculto para probar vídeos de YouTube -->
+    <div id="yt-probe" style="position:absolute;top:-1000px;left:-1000px;width:0;height:0;opacity:0;pointer-events:none;"></div>
 
     <!-- Video de prueba embebido (base64) -->
     <video id="video-prueba" style="display: none;" preload="auto">

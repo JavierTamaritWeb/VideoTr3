@@ -789,6 +789,118 @@ textarea:focus-visible,
     }
 }
 
+/* === CARGA POR URL === */
+.panel-entrada__url {
+    margin-top: var(--espacio-l);
+    padding: var(--espacio-l);
+    background: var(--color-fondo-secundario);
+    border-radius: var(--radio-l);
+    border: 1px solid var(--color-borde);
+}
+
+.panel-entrada__url .input[type="url"] {
+    font-family: monospace;
+    font-size: var(--tamaño-texto-s);
+}
+
+.panel-entrada__url .input[type="url"]:invalid {
+    border-color: var(--color-error);
+}
+
+.panel-entrada__url .boton--bloque {
+    width: 100%;
+    margin-top: var(--espacio-m);
+}
+
+/* Barra de progreso para URL */
+.barra-progreso {
+    position: relative;
+}
+
+.barra-progreso .boton--pequeno {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--espacio-xs) var(--espacio-s);
+    font-size: var(--tamaño-texto-s);
+}
+
+/* Modal de guía de descarga */
+.modal--activo {
+    opacity: 1;
+    visibility: visible;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.guia-descarga {
+    max-width: 100%;
+}
+
+.guia-descarga__intro {
+    padding: var(--espacio-m);
+    background: var(--color-advertencia-fondo);
+    border: 1px solid var(--color-advertencia);
+    border-radius: var(--radio-m);
+    margin-bottom: var(--espacio-l);
+    color: var(--color-advertencia-texto);
+}
+
+.guia-descarga__subtitulo {
+    font-size: var(--tamaño-texto-l);
+    font-weight: var(--peso-medio);
+    margin-bottom: var(--espacio-m);
+    color: var(--color-texto);
+}
+
+.guia-descarga__pasos {
+    margin: var(--espacio-m) 0;
+    padding-left: var(--espacio-l);
+}
+
+.guia-descarga__pasos li {
+    margin-bottom: var(--espacio-s);
+    line-height: 1.5;
+}
+
+.guia-descarga__enlace {
+    margin: var(--espacio-l) 0;
+    text-align: center;
+}
+
+.guia-descarga__enlace a {
+    color: var(--color-primario);
+    text-decoration: none;
+    font-weight: var(--peso-medio);
+}
+
+.guia-descarga__enlace a:hover {
+    text-decoration: underline;
+}
+
+.guia-descarga__acciones {
+    margin-top: var(--espacio-xl);
+    text-align: center;
+}
+
+.guia-descarga__acciones .boton {
+    padding: var(--espacio-m) var(--espacio-xl);
+    font-size: var(--tamaño-texto-l);
+}
+
+/* Región de anuncios accesible (screen reader only) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Animaciones respetando preferencias de movimiento */
 @media (prefers-reduced-motion: reduce) {
     .boton,

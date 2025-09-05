@@ -7,6 +7,7 @@ import { Transcriptor } from './modulos/transcriptor.js';
 import { ExportadorTxtMd } from './modulos/exportador-txt-md.js';
 import { ExportadorRtf } from './modulos/exportador-rtf.js';
 import { ExportadorDocx } from './modulos/exportador-docx.js';
+import { URLLoader } from './modulos/url-loader.js';
 import { mostrarNotificacion, actualizarProgreso, agregarLog } from './modulos/util-archivo.js';
 
 class VideoTR {
@@ -19,11 +20,13 @@ class VideoTR {
         this.exportadorTxtMd = new ExportadorTxtMd();
         this.exportadorRtf = new ExportadorRtf();
         this.exportadorDocx = new ExportadorDocx();
+        this.urlLoader = new URLLoader();
         
         this.videoActual = null;
         this.audioBuffer = null;
         this.transcripcion = '';
         this.metadatos = {};
+        this.controllerCargaUrl = null; // Para cancelar cargas de URL
         
         this.inicializar();
     }
@@ -91,6 +94,9 @@ class VideoTR {
                 this.cargarVideo(e.target.files[0]);
             }
         });
+        
+        // Carga por URL
+        this.configurarCargaPorURL();
         
         // Botón eliminar vídeo
         document.getElementById('btn-eliminar-video').addEventListener('click', () => {
@@ -160,6 +166,133 @@ class VideoTR {
                 this.cambiarTemaRapido();
             }
         });
+    }
+    
+    configurarCargaPorURL() {
+        const btnCargarUrl = document.getElementById('btn-cargar-url');
+        const inputUrl = document.getElementById('input-url');
+        const btnCancelarUrl = document.getElementById('btn-cancelar-url');
+        
+        // Botón cargar URL
+        const manejarCargarUrl = async () => {
+            const url = inputUrl.value.trim();
+            if (!url) {
+                this.ui.anunciar('Por favor, introduce una URL válida');
+                mostrarNotificacion('Por favor, introduce una URL válida', 'error');
+                inputUrl.focus();
+                return;
+            }
+            
+            await this.cargarDesdeURL(url);
+        };
+        
+        btnCargarUrl.addEventListener('click', manejarCargarUrl);
+        
+        // Permitir cargar con Enter en el campo URL
+        inputUrl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                manejarCargarUrl();
+            }
+        });
+        
+        // Validación en tiempo real del campo URL
+        inputUrl.addEventListener('input', (e) => {
+            const url = e.target.value.trim();
+            const esValida = url && /^https?:\/\/(www\.)?(instagram\.com|tiktok\.com|youtu\.be|youtube\.com)\/.+/i.test(url);
+            
+            this.ui.toggleBotonCargarUrl(esValida);
+            
+            if (url && !esValida) {
+                inputUrl.setCustomValidity('URL no válida o plataforma no soportada');
+            } else {
+                inputUrl.setCustomValidity('');
+            }
+        });
+        
+        // Botón cancelar carga URL
+        if (btnCancelarUrl) {
+            btnCancelarUrl.addEventListener('click', () => {
+                this.cancelarCargaUrl();
+            });
+        }
+    }
+    
+    async cargarDesdeURL(url) {
+        try {
+            this.ui.toggleBotonCargarUrl(false);
+            this.ui.mostrarBarraProgresoUrl();
+            this.ui.actualizarProgresoUrl(0, 'Iniciando...');
+            this.ui.anunciar('Iniciando carga desde URL...');
+            
+            // Crear controlador de aborto para poder cancelar
+            this.controllerCargaUrl = new AbortController();
+            
+            await this.urlLoader.cargarDesdeURL(
+                url,
+                // Callback de progreso
+                (porcentaje) => {
+                    this.ui.actualizarProgresoUrl(porcentaje, 'Descargando...');
+                },
+                // Callback cuando el archivo esté listo
+                (file) => {
+                    this.procesarArchivoDesdeURL(file, url);
+                },
+                // Callback para anuncios accesibles
+                (mensaje) => {
+                    this.ui.anunciar(mensaje);
+                },
+                // Controlador de aborto
+                this.controllerCargaUrl
+            );
+            
+        } catch (error) {
+            console.error('Error cargando desde URL:', error);
+            
+            // Si no es una cancelación, mostrar error
+            if (error.name !== 'AbortError') {
+                mostrarNotificacion(error.message, 'error');
+                this.ui.anunciar(`Error: ${error.message}`);
+            }
+        } finally {
+            this.ui.ocultarBarraProgresoUrl();
+            this.ui.toggleBotonCargarUrl(true);
+            this.controllerCargaUrl = null;
+        }
+    }
+    
+    async procesarArchivoDesdeURL(file, urlOriginal) {
+        try {
+            this.ui.actualizarProgresoUrl(100, 'Procesando archivo...');
+            
+            // Agregar metadato de origen URL
+            this.metadatos.origenUrl = urlOriginal;
+            this.metadatos.fechaCarga = new Date().toISOString();
+            
+            // Procesar como cualquier archivo normal
+            await this.cargarVideo(file);
+            
+            this.ui.limpiarUrl();
+            this.ui.anunciar('Archivo cargado y listo para transcripción');
+            mostrarNotificacion('Vídeo cargado correctamente desde URL', 'exito');
+            
+        } catch (error) {
+            console.error('Error procesando archivo desde URL:', error);
+            mostrarNotificacion('Error al procesar el archivo descargado', 'error');
+            this.ui.anunciar(`Error al procesar archivo: ${error.message}`);
+        }
+    }
+    
+    cancelarCargaUrl() {
+        if (this.controllerCargaUrl) {
+            this.controllerCargaUrl.abort();
+            this.controllerCargaUrl = null;
+        }
+        
+        this.ui.ocultarBarraProgresoUrl();
+        this.ui.toggleBotonCargarUrl(true);
+        this.ui.anunciar('Carga cancelada');
+        mostrarNotificacion('Carga desde URL cancelada', 'info');
     }
     
     configurarModales() {
